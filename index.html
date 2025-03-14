@@ -18,6 +18,8 @@
    }
 
    #overlay {
+    display: none;
+    /* Remove overlay */
     position: absolute;
     top: 0;
     left: 0;
@@ -25,7 +27,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     color: #eee;
-    display: flex;
     justify-content: center;
     align-items: center;
     font-size: 2.5em;
@@ -182,7 +183,7 @@
  </head>
 
  <body>
-  <div id="overlay">
+  <!-- <div id="overlay">
    <div>
     Click to Start
     <p id="instructions">
@@ -190,7 +191,7 @@
      Click = Attack)
     </p>
    </div>
-  </div>
+  </div> -->
 
   <div id="healthBar">
    <div id="health"></div>
@@ -241,7 +242,7 @@
 
    // --- Overlay & Instructions ---
    const overlay = document.getElementById('overlay');
-   overlay.addEventListener('click', startGame);
+   //overlay.addEventListener('click', startGame);
 
    // --- Game Over Screen ---
    const gameOverScreen = document.getElementById('gameOver');
@@ -550,8 +551,10 @@
    let gameStarted = false;
 
    function startGame() {
+    if (gameStarted) return; // Prevent multiple starts
+
     controls.lock();
-    overlay.style.display = 'none';
+    //overlay.style.display = 'none';
     gameStarted = true;
     health = 100;
     stamina = 100;
@@ -561,6 +564,9 @@
     monsterHealth = 50;
 
     playSound(backgroundMusic);
+
+    // Request pointer lock
+    renderer.domElement.focus();
    }
 
    function restartGame() {
@@ -787,6 +793,7 @@
 
    // --- Initialize the game ---
    function init() {
+    startGame(); // Start the game immediately
     animate();
    }
 
@@ -805,4 +812,5 @@
  </body>
 
  </html>
+
 
