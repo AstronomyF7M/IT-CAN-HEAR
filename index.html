@@ -3,7 +3,7 @@
 
  <head>
   <meta charset="utf-8">
-  <title>CHROMOSHIFT</title>
+  <title>Ultimate Browser Horror Game</title>
   <style>
    body {
     margin: 0;
@@ -17,27 +17,9 @@
     display: block;
    }
 
+   /* Remove the overlay */
    #overlay {
     display: none;
-    /* Remove overlay */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #eee;
-    justify-content: center;
-    align-items: center;
-    font-size: 2.5em;
-    text-align: center;
-    z-index: 1000;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-   }
-
-   #overlay:hover {
-    background-color: rgba(50, 50, 50, 0.8);
    }
 
    #instructions {
@@ -183,15 +165,7 @@
  </head>
 
  <body>
-  <!-- <div id="overlay">
-   <div>
-    Click to Start
-    <p id="instructions">
-     (W, A, S, D = Move, SHIFT = Sprint, SPACE = Jump, Mouse = Look, E = Interact, Q = Use Item, Mouse
-     Click = Attack)
-    </p>
-   </div>
-  </div> -->
+  <!-- Removed Overlay -->
 
   <div id="healthBar">
    <div id="health"></div>
@@ -225,13 +199,20 @@
   <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
   <script>
+   console.log("Script started"); // Initial script log
+
    // --- Stats ---
    const stats = new Stats();
    document.body.appendChild(stats.dom);
+   console.log("Stats initialized");
 
    // --- Initialization ---
    const scene = new THREE.Scene();
+   console.log("Scene created");
+
    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+   console.log("Camera created");
+
    const renderer = new THREE.WebGLRenderer({
     antialias: true
    });
@@ -239,14 +220,15 @@
    renderer.shadowMap.enabled = true;
    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
    document.body.appendChild(renderer.domElement);
+   console.log("Renderer initialized and added to DOM");
 
    // --- Overlay & Instructions ---
    const overlay = document.getElementById('overlay');
-   //overlay.addEventListener('click', startGame);
+   console.log("Overlay element retrieved");
 
    // --- Game Over Screen ---
    const gameOverScreen = document.getElementById('gameOver');
-   gameOverScreen.addEventListener('click', restartGame);
+   console.log("Game over screen element retrieved");
 
    function showGameOver() {
     gameOverScreen.style.display = 'flex';
@@ -256,6 +238,7 @@
    // --- Health Bar ---
    const healthBar = document.getElementById('health');
    let health = 100;
+   console.log("Health bar initialized");
 
    function updateHealthBar() {
     healthBar.style.width = health + '%';
@@ -265,6 +248,7 @@
    const staminaBar = document.getElementById('stamina');
    let stamina = 100;
    let isSprinting = false;
+   console.log("Stamina bar initialized");
 
    function updateStaminaBar() {
     staminaBar.style.width = stamina + '%';
@@ -273,6 +257,7 @@
    // --- Inventory ---
    const inventoryItemsDisplay = document.getElementById('inventoryItems');
    const inventory = [];
+   console.log("Inventory initialized");
 
    function updateInventoryDisplay() {
     inventoryItemsDisplay.textContent = inventory.length > 0 ? inventory.join(', ') : 'Empty';
@@ -292,9 +277,10 @@
    }
 
    // --- Weapon System ---
-   const weaponDisplay = document.getElementById('currentWeapon');
+   const weaponDisplay = document.getElementById('weaponDisplay');
    let currentWeapon = "None";
    let weaponDamage = 10;
+   console.log("Weapon system initialized");
 
    function updateWeaponDisplay() {
     weaponDisplay.textContent = currentWeapon;
@@ -302,10 +288,12 @@
 
    // --- Fog ---
    scene.fog = new THREE.Fog(0x000000, 0, 75);
+   console.log("Fog added to scene");
 
    // --- Lighting ---
    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
    scene.add(ambientLight);
+   console.log("Ambient light added");
 
    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
    directionalLight.position.set(1, 1, 1).normalize();
@@ -315,11 +303,13 @@
    directionalLight.shadow.camera.near = 0.5;
    directionalLight.shadow.camera.far = 500;
    scene.add(directionalLight);
+   console.log("Directional light added");
 
    const pointLight = new THREE.PointLight(0xff0000, 1, 10);
    pointLight.position.set(5, 1, 5);
    pointLight.castShadow = true;
    scene.add(pointLight);
+   console.log("Point light added");
 
    // --- Player Controls ---
    const controls = new THREE.PointerLockControls(camera, renderer.domElement);
@@ -334,6 +324,7 @@
    let canJump = false;
    const gravity = -9.8;
    const jumpVelocity = 5;
+   console.log("Player controls initialized");
 
    document.addEventListener('keydown', function (event) {
     switch (event.code) {
@@ -400,123 +391,132 @@
    let weaponMesh;
    let keyMesh;
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
-    function (gltf) {
-     monsterMesh = gltf.scene;
-     monsterMesh.scale.set(0.5, 0.5, 0.5);
-     monsterMesh.position.set(10, 0, 10);
-     monsterMesh.castShadow = true;
-     monsterMesh.receiveShadow = true;
-     scene.add(monsterMesh);
-     monsterHealth = 50;
+   function loadModels() {
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
+     function (gltf) {
+      monsterMesh = gltf.scene;
+      monsterMesh.scale.set(0.5, 0.5, 0.5);
+      monsterMesh.position.set(10, 0, 10);
+      monsterMesh.castShadow = true;
+      monsterMesh.receiveShadow = true;
+      scene.add(monsterMesh);
+      monsterHealth = 50;
+      console.log("Monster model loaded");
 
-     playSound(monsterSound);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the model.');
-    }
-   );
+      playSound(monsterSound);
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the monster model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/scene.gltf',
-    function (gltf) {
-     environmentMesh = gltf.scene;
-     environmentMesh.scale.set(0.1, 0.1, 0.1);
-     environmentMesh.position.set(0, -2, 0);
-     environmentMesh.castShadow = false;
-     environmentMesh.receiveShadow = true;
-     scene.add(environmentMesh);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the environment model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/scene.gltf',
+     function (gltf) {
+      environmentMesh = gltf.scene;
+      environmentMesh.scale.set(0.1, 0.1, 0.1);
+      environmentMesh.position.set(0, -2, 0);
+      environmentMesh.castShadow = false;
+      environmentMesh.receiveShadow = true;
+      scene.add(environmentMesh);
+      console.log("Environment model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the environment model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Lantern/glTF/Lantern.gltf',
-    function (gltf) {
-     itemMesh = gltf.scene;
-     itemMesh.scale.set(0.1, 0.1, 0.1);
-     itemMesh.position.set(3, 0, 3);
-     itemMesh.castShadow = true;
-     itemMesh.receiveShadow = true;
-     scene.add(itemMesh);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the item model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/Lantern/glTF/Lantern.gltf',
+     function (gltf) {
+      itemMesh = gltf.scene;
+      itemMesh.scale.set(0.1, 0.1, 0.1);
+      itemMesh.position.set(3, 0, 3);
+      itemMesh.castShadow = true;
+      itemMesh.receiveShadow = true;
+      scene.add(itemMesh);
+      console.log("Item model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the item model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/SimpleSkin/SimpleSkin.gltf',
-    function (gltf) {
-     interactableObject = gltf.scene;
-     interactableObject.scale.set(0.1, 0.1, 0.1);
-     interactableObject.position.set(-3, 0, -3);
-     interactableObject.castShadow = true;
-     interactableObject.receiveShadow = true;
-     scene.add(interactableObject);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the interactable object model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/SimpleSkin/SimpleSkin.gltf',
+     function (gltf) {
+      interactableObject = gltf.scene;
+      interactableObject.scale.set(0.1, 0.1, 0.1);
+      interactableObject.position.set(-3, 0, -3);
+      interactableObject.castShadow = true;
+      interactableObject.receiveShadow = true;
+      scene.add(interactableObject);
+      console.log("Interactable object model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the interactable object model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Flamingo.gltf',
-    function (gltf) {
-     doorMesh = gltf.scene;
-     doorMesh.scale.set(0.1, 0.1, 0.1);
-     doorMesh.position.set(7, 0, -5);
-     doorMesh.castShadow = true;
-     doorMesh.receiveShadow = true;
-     scene.add(doorMesh);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the door model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/Flamingo.gltf',
+     function (gltf) {
+      doorMesh = gltf.scene;
+      doorMesh.scale.set(0.1, 0.1, 0.1);
+      doorMesh.position.set(7, 0, -5);
+      doorMesh.castShadow = true;
+      doorMesh.receiveShadow = true;
+      scene.add(doorMesh);
+      console.log("Door model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the door model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.gltf',
-    function (gltf) {
-     weaponMesh = gltf.scene;
-     weaponMesh.scale.set(0.1, 0.1, 0.1);
-     weaponMesh.position.set(0, 0, 2);
-     weaponMesh.castShadow = true;
-     weaponMesh.receiveShadow = true;
-     camera.add(weaponMesh);
-     scene.add(camera);
-     currentWeapon = "Sword";
-     updateWeaponDisplay();
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the weapon model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.gltf',
+     function (gltf) {
+      weaponMesh = gltf.scene;
+      weaponMesh.scale.set(0.1, 0.1, 0.1);
+      weaponMesh.position.set(0, 0, 2);
+      weaponMesh.castShadow = true;
+      weaponMesh.receiveShadow = true;
+      camera.add(weaponMesh);
+      scene.add(camera);
+      currentWeapon = "Sword";
+      updateWeaponDisplay();
+      console.log("Weapon model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the weapon model.');
+     }
+    );
 
-   gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Key/glTF/Key.gltf',
-    function (gltf) {
-     keyMesh = gltf.scene;
-     keyMesh.scale.set(0.1, 0.1, 0.1);
-     keyMesh.position.set(-5, 0, 5);
-     keyMesh.castShadow = true;
-     keyMesh.receiveShadow = true;
-     scene.add(keyMesh);
-    },
-    undefined,
-    function (error) {
-     console.error('An error happened while loading the key model.');
-    }
-   );
+    gltfLoader.load(
+     'https://threejs.org/examples/models/gltf/Key/glTF/Key.gltf',
+     function (gltf) {
+      keyMesh = gltf.scene;
+      keyMesh.scale.set(0.1, 0.1, 0.1);
+      keyMesh.position.set(-5, 0, 5);
+      keyMesh.castShadow = true;
+      keyMesh.receiveShadow = true;
+      scene.add(keyMesh);
+      console.log("Key model loaded");
+     },
+     undefined,
+     function (error) {
+      console.error('An error happened while loading the key model.');
+     }
+    );
+   }
 
    // --- Ground ---
    const groundGeometry = new THREE.PlaneGeometry(100, 100, 100, 100);
@@ -527,10 +527,12 @@
    groundMesh.rotation.x = -Math.PI / 2;
    groundMesh.receiveShadow = true;
    scene.add(groundMesh);
+   console.log("Ground created");
 
    // --- Camera Setup ---
    camera.position.y = 1.6;
    camera.position.z = 5;
+   console.log("Camera positioned");
 
    // --- Message Box ---
    const messageBox = document.getElementById('messageBox');
@@ -551,11 +553,14 @@
    let gameStarted = false;
 
    function startGame() {
-    if (gameStarted) return; // Prevent multiple starts
+    if (gameStarted) return;
 
-    controls.lock();
-    //overlay.style.display = 'none';
     gameStarted = true;
+    // Request pointer lock early
+    renderer.domElement.focus();
+    controls.lock();
+    console.log("Game started, controls locked");
+
     health = 100;
     stamina = 100;
     updateHealthBar();
@@ -564,9 +569,6 @@
     monsterHealth = 50;
 
     playSound(backgroundMusic);
-
-    // Request pointer lock
-    renderer.domElement.focus();
    }
 
    function restartGame() {
@@ -625,57 +627,65 @@
     }
    }
 
+   // --- Update Physics ---
+   const raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 1.7);
+   const clock = new THREE.Clock();
+
    function updatePhysics() {
     if (!gameStarted) return;
 
-    raycaster.ray.origin.copy(controls.getObject().position);
-    raycaster.ray.origin.y -= 1;
-    const intersections = raycaster.intersectObjects([groundMesh]);
+    const delta = clock.getDelta(); // Get the time difference
 
-    const onObject = intersections.length > 0;
-    const delta = clock.getDelta();
-
-    velocity.x -= velocity.x * 10.0 * delta;
-    velocity.z -= velocity.z * 10.0 * delta;
-    velocity.y -= 9.8 * 100.0 * delta;
-
+    // Movement
     direction.z = Number(moveForward) - Number(moveBackward);
     direction.x = Number(moveRight) - Number(moveLeft);
-    direction.normalize();
+    direction.normalize(); // Ensure diagonal movement isn't faster
 
-    moveSpeed = sprint && stamina > 0 ? 10.0 : 5.0;
+    let currentMoveSpeed = sprint && stamina > 0 ? 10 : 5;
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+    if (moveForward || moveBackward) velocity.z -= direction.z * currentMoveSpeed * 100 * delta;
+    if (moveLeft || moveRight) velocity.x -= direction.x * currentMoveSpeed * 100 * delta;
 
-    if (onObject === true) {
-     velocity.y = Math.max(0, velocity.y);
+    controls.moveRight(velocity.x * delta);
+    controls.moveForward(velocity.z * delta);
+
+    // Jumping and gravity
+    raycaster.ray.origin.copy(controls.getObject().position);
+    raycaster.ray.origin.y -= 1; // Slightly below the player's feet
+    const intersections = raycaster.intersectObjects([groundMesh]);
+    const onObject = intersections.length > 0;
+
+    if (onObject) {
+     velocity.y = 0; // Reset velocity when on the ground
      canJump = true;
+    } else {
+     velocity.y -= 9.8 * 100 * delta; // Apply gravity
+     canJump = false;
     }
 
-    controls.moveRight(-velocity.x * delta);
-    controls.moveForward(-velocity.z * delta);
-    controls.getObject().position.y += velocity.y * delta;
+    controls.getObject().position.y += velocity.y * delta; // Apply gravity
 
     if (controls.getObject().position.y < 1.6) {
      velocity.y = 0;
-     controls.getObject().position.y = 1.6;
-
-     canJump = true;
+     controls.getObject().position.y = 1.6; // Reset position
     }
 
-    // Stamina management
+    // Apply damping
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
+
+    // Stamina Management
     if (sprint && (moveForward || moveBackward || moveLeft || moveRight)) {
      if (stamina > 0) {
-      stamina -= 1;
+      stamina -= 1; // drain stamina
      } else {
-      sprint = false;
+      sprint = false; //Stop sprinting
      }
     } else if (stamina < 100) {
-     stamina += 0.5;
+     stamina += 0.5; //Regen stamina
     }
 
-    stamina = Math.max(0, Math.min(100, stamina));
+    stamina = Math.max(0, Math.min(100, stamina)); //Clamp stamina
     updateStaminaBar();
 
     // Monster AI (Simple)
@@ -684,11 +694,12 @@
      const monsterPosition = monsterMesh.position.clone();
      const directionToPlayer = targetPosition.sub(monsterPosition).normalize();
 
-     monsterMesh.position.add(directionToPlayer.multiplyScalar(0.05));
+     monsterMesh.position.add(directionToPlayer.multiplyScalar(0.05)); // Adjust speed
 
+     // Check for monster proximity
      const distanceToMonster = controls.getObject().position.distanceTo(monsterMesh.position);
      if (distanceToMonster < 2) {
-      health -= 1;
+      health -= 1; // Decrease health
       updateHealthBar();
       if (health <= 0) {
        showGameOver();
@@ -720,49 +731,6 @@
     }
    }
 
-   // --- Interaction Function ---
-   function interact() {
-    if (!interactableObject) return;
-
-    const distanceToInteractable = controls.getObject().position.distanceTo(interactableObject.position);
-
-    if (distanceToInteractable < 2) {
-     interactableObject.traverse(function (child) {
-      if (child instanceof THREE.Mesh) {
-       child.material.color.setHex(Math.random() * 0xffffff);
-      }
-     });
-     showMessage("You interacted with the object!");
-    }
-
-    if (doorMesh) {
-     const distanceToDoor = controls.getObject().position.distanceTo(doorMesh.position);
-     if (distanceToDoor < 2) {
-      if (inventory.includes("Key")) {
-       showMessage("You opened the door with the key!");
-       scene.remove(doorMesh);
-       doorMesh = null;
-       removeItemFromInventory("Key");
-      } else {
-       showMessage("The door is locked. Find a key!");
-      }
-     }
-    }
-   }
-
-   // --- Use Item Function ---
-   function useItem() {
-    if (inventory.includes("Lantern")) {
-     showMessage("You used the Lantern to light your way!");
-     scene.fog.density = 0.05;
-    } else {
-     showMessage("You have no items to use!");
-    }
-   }
-
-   // --- Clock ---
-   const clock = new THREE.Clock();
-
    // --- Animation Loop ---
    function animate() {
     requestAnimationFrame(animate);
@@ -771,7 +739,9 @@
 
     updatePhysics();
     updateMinimap();
+    //console.log("Rendering scene"); // Log before rendering
     renderer.render(scene, camera);
+    //console.log("Scene rendered"); // Log after rendering
    }
 
    // --- Window Resize Handler ---
@@ -792,12 +762,21 @@
    }
 
    // --- Initialize the game ---
+
    function init() {
+    console.log("Initializing game...");
+    loadModels(); // Load models first
+    console.log("Models loading initiated.");
     startGame(); // Start the game immediately
-    animate();
+    console.log("Game start initiated.");
+    animate(); // Start the animation loop
+    console.log("Animation loop started.");
+
    }
 
+   // Call init to start the game after resources are loaded
    init();
+   console.log("Init function called");
   </script>
   <!-- AUDIO -->
   <audio id="backgroundMusic" loop>
