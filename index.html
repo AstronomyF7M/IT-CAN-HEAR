@@ -8,6 +8,9 @@
    body {
     margin: 0;
     overflow: hidden;
+    background-color: #121212;
+    color: #f0f0f0;
+    font-family: monospace;
    }
 
    canvas {
@@ -21,20 +24,25 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    /* Semi-transparent black */
-    color: white;
+    color: #eee;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: 2.5em;
     text-align: center;
     z-index: 1000;
-    /* Ensure it's on top */
     cursor: pointer;
+    transition: background-color 0.3s ease;
+   }
+
+   #overlay:hover {
+    background-color: rgba(50, 50, 50, 0.8);
    }
 
    #instructions {
-    font-size: 1em;
+    font-size: 0.6em;
+    margin-top: 20px;
+    color: #ccc;
    }
 
    #healthBar {
@@ -43,15 +51,18 @@
     left: 20px;
     width: 200px;
     height: 20px;
-    background-color: red;
-    border: 1px solid white;
+    background-color: #333;
+    border: 1px solid #eee;
     z-index: 1000;
+    border-radius: 5px;
+    overflow: hidden;
    }
 
    #health {
     width: 100%;
     height: 100%;
-    background-color: green;
+    background-color: #00cc00;
+    transition: width 0.3s ease;
    }
 
    #staminaBar {
@@ -60,26 +71,31 @@
     left: 20px;
     width: 200px;
     height: 20px;
-    background-color: gray;
-    border: 1px solid white;
+    background-color: #333;
+    border: 1px solid #eee;
     z-index: 1000;
+    border-radius: 5px;
+    overflow: hidden;
    }
 
    #stamina {
     width: 100%;
     height: 100%;
-    background-color: yellow;
+    background-color: #ffcc00;
+    transition: width 0.3s ease;
    }
 
    #inventory {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 10px;
-    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #eee;
+    padding: 10px 15px;
+    border: 1px solid #eee;
     z-index: 1000;
+    border-radius: 5px;
+    font-size: 1.2em;
    }
 
    #gameOver {
@@ -88,18 +104,20 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    /* Semi-transparent black */
-    color: red;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #ff4444;
     display: none;
-    /* Hidden by default */
     justify-content: center;
     align-items: center;
-    font-size: 5em;
+    font-size: 6em;
     text-align: center;
     z-index: 1001;
-    /* Above everything */
     cursor: pointer;
+    transition: background-color 0.3s ease;
+   }
+
+   #gameOver:hover {
+    background-color: rgba(50, 0, 0, 0.9);
    }
 
    #messageBox {
@@ -107,34 +125,45 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 20px;
-    border: 2px solid white;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #eee;
+    padding: 25px;
+    border: 2px solid #eee;
     border-radius: 10px;
     z-index: 1002;
-    /* Above everything else */
     text-align: center;
-    font-size: 1.5em;
+    font-size: 1.6em;
     display: none;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
    }
 
    #messageBox button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    font-size: 0.8em;
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 0.9em;
     cursor: pointer;
+    background-color: #444;
+    color: #eee;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+   }
+
+   #messageBox button:hover {
+    background-color: #666;
    }
 
    #weaponDisplay {
     position: absolute;
     top: 80px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 10px;
-    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #eee;
+    padding: 10px 15px;
+    border: 1px solid #eee;
     z-index: 1000;
+    border-radius: 5px;
+    font-size: 1.2em;
    }
 
    #minimap {
@@ -143,9 +172,11 @@
     right: 20px;
     width: 150px;
     height: 150px;
-    border: 2px solid white;
-    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #eee;
+    background-color: rgba(0, 0, 0, 0.7);
     z-index: 1000;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
    }
   </style>
  </head>
@@ -192,7 +223,6 @@
   <script src="https://threejs.org/examples/js/controls/PointerLockControls.js"></script>
   <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
-
   <script>
    // --- Stats ---
    const stats = new Stats();
@@ -204,14 +234,14 @@
    const renderer = new THREE.WebGLRenderer({
     antialias: true
    });
-   renderer.setSize(window.innerWidth, window.innerWidth);
+   renderer.setSize(window.innerWidth, window.innerHeight);
    renderer.shadowMap.enabled = true;
    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
    document.body.appendChild(renderer.domElement);
 
    // --- Overlay & Instructions ---
    const overlay = document.getElementById('overlay');
-   overlay.addEventListener('click', startGame); // Start Game on Click
+   overlay.addEventListener('click', startGame);
 
    // --- Game Over Screen ---
    const gameOverScreen = document.getElementById('gameOver');
@@ -219,7 +249,7 @@
 
    function showGameOver() {
     gameOverScreen.style.display = 'flex';
-    controls.unlock(); // Unlock controls so user can click
+    controls.unlock();
    }
 
    // --- Health Bar ---
@@ -364,13 +394,13 @@
    let monsterMesh;
    let environmentMesh;
    let itemMesh;
-   let interactableObject; // New variable for interactable object
-   let doorMesh; // New door mesh
-   let weaponMesh; // New weapon mesh
+   let interactableObject;
+   let doorMesh;
+   let weaponMesh;
    let keyMesh;
 
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', // Replace with your GLTF model path
+    'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
     function (gltf) {
      monsterMesh = gltf.scene;
      monsterMesh.scale.set(0.5, 0.5, 0.5);
@@ -378,9 +408,8 @@
      monsterMesh.castShadow = true;
      monsterMesh.receiveShadow = true;
      scene.add(monsterMesh);
-     monsterHealth = 50; // Set initial monster health
+     monsterHealth = 50;
 
-     // Play monster sound when monster is loaded
      playSound(monsterSound);
     },
     undefined,
@@ -390,13 +419,13 @@
    );
 
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/scene.gltf', // Replace with your environment GLTF model path
+    'https://threejs.org/examples/models/gltf/scene.gltf',
     function (gltf) {
      environmentMesh = gltf.scene;
      environmentMesh.scale.set(0.1, 0.1, 0.1);
-     environmentMesh.position.set(0, -2, 0); // Adjust position as needed
-     environmentMesh.castShadow = false; // Adjust shadow settings
-     environmentMesh.receiveShadow = true; // Adjust shadow settings
+     environmentMesh.position.set(0, -2, 0);
+     environmentMesh.castShadow = false;
+     environmentMesh.receiveShadow = true;
      scene.add(environmentMesh);
     },
     undefined,
@@ -406,13 +435,13 @@
    );
 
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Lantern/glTF/Lantern.gltf', // Replace with your item GLTF model path
+    'https://threejs.org/examples/models/gltf/Lantern/glTF/Lantern.gltf',
     function (gltf) {
      itemMesh = gltf.scene;
      itemMesh.scale.set(0.1, 0.1, 0.1);
-     itemMesh.position.set(3, 0, 3); // Adjust position as needed
-     itemMesh.castShadow = true; // Adjust shadow settings
-     itemMesh.receiveShadow = true; // Adjust shadow settings
+     itemMesh.position.set(3, 0, 3);
+     itemMesh.castShadow = true;
+     itemMesh.receiveShadow = true;
      scene.add(itemMesh);
     },
     undefined,
@@ -421,15 +450,14 @@
     }
    );
 
-   // Load interactable object
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/SimpleSkin/SimpleSkin.gltf', // Replace with your interactable object GLTF model path
+    'https://threejs.org/examples/models/gltf/SimpleSkin/SimpleSkin.gltf',
     function (gltf) {
      interactableObject = gltf.scene;
      interactableObject.scale.set(0.1, 0.1, 0.1);
-     interactableObject.position.set(-3, 0, -3); // Adjust position as needed
-     interactableObject.castShadow = true; // Adjust shadow settings
-     interactableObject.receiveShadow = true; // Adjust shadow settings
+     interactableObject.position.set(-3, 0, -3);
+     interactableObject.castShadow = true;
+     interactableObject.receiveShadow = true;
      scene.add(interactableObject);
     },
     undefined,
@@ -438,15 +466,14 @@
     }
    );
 
-   // Load door model
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Flamingo.gltf', // Replace with your door GLTF model path
+    'https://threejs.org/examples/models/gltf/Flamingo.gltf',
     function (gltf) {
      doorMesh = gltf.scene;
      doorMesh.scale.set(0.1, 0.1, 0.1);
-     doorMesh.position.set(7, 0, -5); // Adjust position as needed
-     doorMesh.castShadow = true; // Adjust shadow settings
-     doorMesh.receiveShadow = true; // Adjust shadow settings
+     doorMesh.position.set(7, 0, -5);
+     doorMesh.castShadow = true;
+     doorMesh.receiveShadow = true;
      scene.add(doorMesh);
     },
     undefined,
@@ -455,16 +482,15 @@
     }
    );
 
-   // Load weapon model
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.gltf', // Replace with your weapon GLTF model path
+    'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.gltf',
     function (gltf) {
      weaponMesh = gltf.scene;
      weaponMesh.scale.set(0.1, 0.1, 0.1);
-     weaponMesh.position.set(0, 0, 2); // Position in front of the player
-     weaponMesh.castShadow = true; // Adjust shadow settings
-     weaponMesh.receiveShadow = true; // Adjust shadow settings
-     camera.add(weaponMesh); // Add weapon to the camera
+     weaponMesh.position.set(0, 0, 2);
+     weaponMesh.castShadow = true;
+     weaponMesh.receiveShadow = true;
+     camera.add(weaponMesh);
      scene.add(camera);
      currentWeapon = "Sword";
      updateWeaponDisplay();
@@ -475,13 +501,12 @@
     }
    );
 
-   // Load key model
    gltfLoader.load(
-    'https://threejs.org/examples/models/gltf/Key/glTF/Key.gltf', // Replace with your key GLTF model path
+    'https://threejs.org/examples/models/gltf/Key/glTF/Key.gltf',
     function (gltf) {
      keyMesh = gltf.scene;
      keyMesh.scale.set(0.1, 0.1, 0.1);
-     keyMesh.position.set(-5, 0, 5); // Position of the key
+     keyMesh.position.set(-5, 0, 5);
      keyMesh.castShadow = true;
      keyMesh.receiveShadow = true;
      scene.add(keyMesh);
@@ -503,7 +528,7 @@
    scene.add(groundMesh);
 
    // --- Camera Setup ---
-   camera.position.y = 1.6; // Average human eye height
+   camera.position.y = 1.6;
    camera.position.z = 5;
 
    // --- Message Box ---
@@ -513,12 +538,12 @@
    function showMessage(message) {
     messageText.textContent = message;
     messageBox.style.display = 'block';
-    controls.unlock(); // Unlock controls when message box is shown
+    controls.unlock();
    }
 
    function closeMessageBox() {
     messageBox.style.display = 'none';
-    controls.lock(); // Relock controls when message box is closed
+    controls.lock();
    }
 
    // --- Game State ---
@@ -528,41 +553,37 @@
     controls.lock();
     overlay.style.display = 'none';
     gameStarted = true;
-    health = 100; // Reset health
-    stamina = 100; // Reset stamina
+    health = 100;
+    stamina = 100;
     updateHealthBar();
     updateStaminaBar();
-    gameOverScreen.style.display = 'none'; // Hide game over screen
-    monsterHealth = 50; // Reset monster health
+    gameOverScreen.style.display = 'none';
+    monsterHealth = 50;
 
-    // Play background music when game starts
     playSound(backgroundMusic);
    }
 
    function restartGame() {
-    // Reset player position
     controls.getObject().position.set(0, 1.6, 5);
-    // Hide game over screen
     gameOverScreen.style.display = 'none';
-    startGame(); // Restart the game
+    startGame();
    }
 
    // --- Monster Health ---
    let monsterHealth = 50;
 
    function attack() {
-    if (!monsterMesh) return; // If no monster, exit
+    if (!monsterMesh) return;
 
     const distanceToMonster = controls.getObject().position.distanceTo(monsterMesh.position);
 
     if (distanceToMonster < 3) {
-     // Attack logic
-     monsterHealth -= weaponDamage; // Reduce monster health
+     monsterHealth -= weaponDamage;
      showMessage("You attacked the monster for " + weaponDamage + " damage!");
 
      if (monsterHealth <= 0) {
-      scene.remove(monsterMesh); // Remove the monster
-      monsterMesh = null; // Set monsterMesh to null
+      scene.remove(monsterMesh);
+      monsterMesh = null;
       showMessage("You defeated the monster!");
      }
     } else {
@@ -577,20 +598,16 @@
    function updateMinimap() {
     minimapContext.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
 
-    // Player position on minimap
     const playerX = controls.getObject().position.x;
     const playerZ = controls.getObject().position.z;
 
-    // Scale player position to fit within minimap
-    const minimapScale = 2; // Adjust for desired minimap size relative to game world
+    const minimapScale = 2;
     const playerMinimapX = (playerX * minimapScale) + minimapCanvas.width / 2;
     const playerMinimapY = (playerZ * minimapScale) + minimapCanvas.height / 2;
 
-    // Draw player as a white dot
     minimapContext.fillStyle = 'white';
     minimapContext.fillRect(playerMinimapX - 2, playerMinimapY - 2, 4, 4);
 
-    // Draw monster if it exists
     if (monsterMesh) {
      const monsterX = monsterMesh.position.x;
      const monsterZ = monsterMesh.position.z;
@@ -603,10 +620,10 @@
    }
 
    function updatePhysics() {
-    if (!gameStarted) return; // Only update physics if the game has started
+    if (!gameStarted) return;
 
     raycaster.ray.origin.copy(controls.getObject().position);
-    raycaster.ray.origin.y -= 1; // Shift origin slightly below camera
+    raycaster.ray.origin.y -= 1;
     const intersections = raycaster.intersectObjects([groundMesh]);
 
     const onObject = intersections.length > 0;
@@ -614,13 +631,13 @@
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
-    velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+    velocity.y -= 9.8 * 100.0 * delta;
 
     direction.z = Number(moveForward) - Number(moveBackward);
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize();
 
-    moveSpeed = sprint && stamina > 0 ? 10.0 : 5.0; //Sprinting speed
+    moveSpeed = sprint && stamina > 0 ? 10.0 : 5.0;
 
     if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
     if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
@@ -632,7 +649,7 @@
 
     controls.moveRight(-velocity.x * delta);
     controls.moveForward(-velocity.z * delta);
-    controls.getObject().position.y += velocity.y * delta; // New behavior
+    controls.getObject().position.y += velocity.y * delta;
 
     if (controls.getObject().position.y < 1.6) {
      velocity.y = 0;
@@ -644,15 +661,15 @@
     // Stamina management
     if (sprint && (moveForward || moveBackward || moveLeft || moveRight)) {
      if (stamina > 0) {
-      stamina -= 1; // drain stamina
+      stamina -= 1;
      } else {
-      sprint = false; //Stop sprinting
+      sprint = false;
      }
     } else if (stamina < 100) {
-     stamina += 0.5; //Regen stamina
+     stamina += 0.5;
     }
 
-    stamina = Math.max(0, Math.min(100, stamina)); //Clamp stamina
+    stamina = Math.max(0, Math.min(100, stamina));
     updateStaminaBar();
 
     // Monster AI (Simple)
@@ -661,18 +678,15 @@
      const monsterPosition = monsterMesh.position.clone();
      const directionToPlayer = targetPosition.sub(monsterPosition).normalize();
 
-     monsterMesh.position.add(directionToPlayer.multiplyScalar(0.05)); // Adjust speed
+     monsterMesh.position.add(directionToPlayer.multiplyScalar(0.05));
 
-     // Check for monster proximity
      const distanceToMonster = controls.getObject().position.distanceTo(monsterMesh.position);
      if (distanceToMonster < 2) {
-      health -= 1; // Decrease health
+      health -= 1;
       updateHealthBar();
       if (health <= 0) {
-       // Game Over Logic
-       // alert("Game Over!");
        showGameOver();
-       gameStarted = false; // Stop game updates
+       gameStarted = false;
       }
      }
     }
@@ -683,8 +697,8 @@
      if (distanceToItem < 2) {
       addItemToInventory("Lantern");
       scene.remove(itemMesh);
-      itemMesh = null; // Remove the reference to the item
-      showMessage("You picked up a Lantern!"); // Show message
+      itemMesh = null;
+      showMessage("You picked up a Lantern!");
      }
     }
 
@@ -694,20 +708,19 @@
      if (distanceToKey < 2) {
       addItemToInventory("Key");
       scene.remove(keyMesh);
-      keyMesh = null; // Remove the reference to the key
-      showMessage("You picked up a Key!"); // Show message
+      keyMesh = null;
+      showMessage("You picked up a Key!");
      }
     }
    }
 
    // --- Interaction Function ---
    function interact() {
-    if (!interactableObject) return; // If no interactable object, exit
+    if (!interactableObject) return;
 
     const distanceToInteractable = controls.getObject().position.distanceTo(interactableObject.position);
 
     if (distanceToInteractable < 2) {
-     // Interaction logic - example: change object color
      interactableObject.traverse(function (child) {
       if (child instanceof THREE.Mesh) {
        child.material.color.setHex(Math.random() * 0xffffff);
@@ -721,9 +734,9 @@
      if (distanceToDoor < 2) {
       if (inventory.includes("Key")) {
        showMessage("You opened the door with the key!");
-       scene.remove(doorMesh); // Remove the door
-       doorMesh = null; // Set doorMesh to null
-       removeItemFromInventory("Key"); // Remove key from inventory
+       scene.remove(doorMesh);
+       doorMesh = null;
+       removeItemFromInventory("Key");
       } else {
        showMessage("The door is locked. Find a key!");
       }
@@ -734,10 +747,8 @@
    // --- Use Item Function ---
    function useItem() {
     if (inventory.includes("Lantern")) {
-     // Use lantern logic
      showMessage("You used the Lantern to light your way!");
-     // Add actual lantern lighting effect here
-     scene.fog.density = 0.05; //Example, makes fog thinner
+     scene.fog.density = 0.05;
     } else {
      showMessage("You have no items to use!");
     }
@@ -750,10 +761,10 @@
    function animate() {
     requestAnimationFrame(animate);
 
-    stats.update(); //Update FPS stats
+    stats.update();
 
     updatePhysics();
-    updateMinimap(); // Update the minimap
+    updateMinimap();
     renderer.render(scene, camera);
    }
 
@@ -770,13 +781,17 @@
    const monsterSound = document.getElementById('monsterSound');
 
    function playSound(audio) {
-    audio.currentTime = 0; // Reset to the beginning
+    audio.currentTime = 0;
     audio.play();
    }
 
-   animate();
-  </script>
+   // --- Initialize the game ---
+   function init() {
+    animate();
+   }
 
+   init();
+  </script>
   <!-- AUDIO -->
   <audio id="backgroundMusic" loop>
    <source src="BackgroundMusic.mp3" type="audio/mpeg">
@@ -790,3 +805,4 @@
  </body>
 
  </html>
+
