@@ -8,8 +8,9 @@
    body {
     margin: 0;
     overflow: hidden;
-    background-color: #121212;
-    color: #f0f0f0;
+    background-color: #000;
+    /* Deep black background */
+    color: #ddd;
     font-family: monospace;
    }
 
@@ -34,8 +35,10 @@
     left: 20px;
     width: 200px;
     height: 20px;
-    background-color: #333;
-    border: 1px solid #eee;
+    background-color: #222;
+    /* Darker background */
+    border: 1px solid #888;
+    /* Subtle border */
     z-index: 1000;
     border-radius: 5px;
     overflow: hidden;
@@ -44,7 +47,8 @@
    #health {
     width: 100%;
     height: 100%;
-    background-color: #00cc00;
+    background-color: #4CAF50;
+    /* Healthier green */
     transition: width 0.3s ease;
    }
 
@@ -54,8 +58,10 @@
     left: 20px;
     width: 200px;
     height: 20px;
-    background-color: #333;
-    border: 1px solid #eee;
+    background-color: #222;
+    /* Darker background */
+    border: 1px solid #888;
+    /* Subtle border */
     z-index: 1000;
     border-radius: 5px;
     overflow: hidden;
@@ -64,7 +70,8 @@
    #stamina {
     width: 100%;
     height: 100%;
-    background-color: #ffcc00;
+    background-color: #FFC107;
+    /* Energy yellow */
     transition: width 0.3s ease;
    }
 
@@ -72,10 +79,12 @@
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Darker, more transparent */
     color: #eee;
     padding: 10px 15px;
-    border: 1px solid #eee;
+    border: 1px solid #888;
+    /* Subtle border */
     z-index: 1000;
     border-radius: 5px;
     font-size: 1.2em;
@@ -87,8 +96,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    color: #ff4444;
+    background-color: rgba(0, 0, 0, 0.95);
+    /* Opaque dark */
+    color: #F44336;
+    /* Danger red */
     display: none;
     justify-content: center;
     align-items: center;
@@ -100,7 +111,7 @@
    }
 
    #gameOver:hover {
-    background-color: rgba(50, 0, 0, 0.9);
+    background-color: rgba(50, 0, 0, 0.95);
    }
 
    #messageBox {
@@ -108,16 +119,19 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Darker, more opaque */
     color: #eee;
     padding: 25px;
-    border: 2px solid #eee;
+    border: 2px solid #888;
+    /* Subtle border */
     border-radius: 10px;
     z-index: 1002;
     text-align: center;
     font-size: 1.6em;
     display: none;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    /* Deeper shadow */
    }
 
    #messageBox button {
@@ -125,7 +139,8 @@
     padding: 10px 20px;
     font-size: 0.9em;
     cursor: pointer;
-    background-color: #444;
+    background-color: #555;
+    /* Darker */
     color: #eee;
     border: none;
     border-radius: 5px;
@@ -133,17 +148,20 @@
    }
 
    #messageBox button:hover {
-    background-color: #666;
+    background-color: #777;
+    /* Lighter hover */
    }
 
    #weaponDisplay {
     position: absolute;
     top: 80px;
     left: 20px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Darker, more transparent */
     color: #eee;
     padding: 10px 15px;
-    border: 1px solid #eee;
+    border: 1px solid #888;
+    /* Subtle border */
     z-index: 1000;
     border-radius: 5px;
     font-size: 1.2em;
@@ -155,11 +173,14 @@
     right: 20px;
     width: 150px;
     height: 150px;
-    border: 2px solid #eee;
-    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid #888;
+    /* Subtle border */
+    background-color: rgba(0, 0, 0, 0.8);
+    /* Darker, more transparent */
     z-index: 1000;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    /* Deeper shadow */
    }
   </style>
  </head>
@@ -199,8 +220,6 @@
   <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
   <script>
-   console.log("Script started"); // Initial script log
-
    // --- Stats ---
    const stats = new Stats();
    document.body.appendChild(stats.dom);
@@ -209,6 +228,7 @@
    // --- Initialization ---
    const scene = new THREE.Scene();
    console.log("Scene created");
+   scene.fog = new THREE.Fog(0x000000, 0, 50); // Reduced visibility
 
    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
    console.log("Camera created");
@@ -221,6 +241,7 @@
    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
    document.body.appendChild(renderer.domElement);
    console.log("Renderer initialized and added to DOM");
+   renderer.setClearColor(0x000000); // Set a clear color
 
    // --- Overlay & Instructions ---
    const overlay = document.getElementById('overlay');
@@ -286,30 +307,33 @@
     weaponDisplay.textContent = currentWeapon;
    }
 
-   // --- Fog ---
-   scene.fog = new THREE.Fog(0x000000, 0, 75);
-   console.log("Fog added to scene");
-
    // --- Lighting ---
-   const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+   const ambientLight = new THREE.AmbientLight(0x222222); // Darker Ambient
    scene.add(ambientLight);
    console.log("Ambient light added");
 
-   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
    directionalLight.position.set(1, 1, 1).normalize();
    directionalLight.castShadow = true;
-   directionalLight.shadow.mapSize.width = 2048;
-   directionalLight.shadow.mapSize.height = 2048;
-   directionalLight.shadow.camera.near = 0.5;
-   directionalLight.shadow.camera.far = 500;
+   directionalLight.shadow.mapSize.width = 1024; // Reduced shadow quality
+   directionalLight.shadow.mapSize.height = 1024;
    scene.add(directionalLight);
    console.log("Directional light added");
 
-   const pointLight = new THREE.PointLight(0xff0000, 1, 10);
-   pointLight.position.set(5, 1, 5);
-   pointLight.castShadow = true;
-   scene.add(pointLight);
-   console.log("Point light added");
+   const spotLight = new THREE.SpotLight(0xffffff, 1);
+   spotLight.position.set(0, 5, 0);
+   spotLight.angle = Math.PI / 4;
+   spotLight.penumbra = 0.05;
+   spotLight.decay = 2;
+   spotLight.distance = 50;
+
+   spotLight.castShadow = true;
+   spotLight.shadow.mapSize.width = 1024;
+   spotLight.shadow.mapSize.height = 1024;
+   spotLight.shadow.camera.near = 1;
+   spotLight.shadow.camera.far = 20;
+   scene.add(spotLight);
+   console.log("Spot light added");
 
    // --- Player Controls ---
    const controls = new THREE.PointerLockControls(camera, renderer.domElement);
@@ -396,10 +420,18 @@
      'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
      function (gltf) {
       monsterMesh = gltf.scene;
-      monsterMesh.scale.set(0.5, 0.5, 0.5);
+      monsterMesh.scale.set(0.7, 0.7, 0.7); // Slightly larger
       monsterMesh.position.set(10, 0, 10);
       monsterMesh.castShadow = true;
       monsterMesh.receiveShadow = true;
+      //Make the Monster Scary
+      monsterMesh.traverse(function (node) {
+       if (node.isMesh) {
+        node.material.roughness = 1.0;
+        node.material.metalness = 0.0;
+        node.material.color.setHex(0x550000); //Dark Red
+       }
+      });
       scene.add(monsterMesh);
       monsterHealth = 50;
       console.log("Monster model loaded");
@@ -418,7 +450,7 @@
       environmentMesh = gltf.scene;
       environmentMesh.scale.set(0.1, 0.1, 0.1);
       environmentMesh.position.set(0, -2, 0);
-      environmentMesh.castShadow = false;
+      environmentMesh.castShadow = true;
       environmentMesh.receiveShadow = true;
       scene.add(environmentMesh);
       console.log("Environment model loaded");
@@ -521,8 +553,8 @@
    // --- Ground ---
    const groundGeometry = new THREE.PlaneGeometry(100, 100, 100, 100);
    const groundMaterial = new THREE.MeshLambertMaterial({
-    color: 0x808080
-   });
+    color: 0x333333
+   }); // Darker Ground
    groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
    groundMesh.rotation.x = -Math.PI / 2;
    groundMesh.receiveShadow = true;
@@ -731,6 +763,46 @@
     }
    }
 
+   // --- Interaction Function ---
+   function interact() {
+    if (!interactableObject) return;
+
+    const distanceToInteractable = controls.getObject().position.distanceTo(interactableObject.position);
+
+    if (distanceToInteractable < 2) {
+     interactableObject.traverse(function (child) {
+      if (child instanceof THREE.Mesh) {
+       child.material.color.setHex(Math.random() * 0xffffff);
+      }
+     });
+     showMessage("You interacted with the object!");
+    }
+
+    if (doorMesh) {
+     const distanceToDoor = controls.getObject().position.distanceTo(doorMesh.position);
+     if (distanceToDoor < 2) {
+      if (inventory.includes("Key")) {
+       showMessage("You opened the door with the key!");
+       scene.remove(doorMesh);
+       doorMesh = null;
+       removeItemFromInventory("Key");
+      } else {
+       showMessage("The door is locked. Find a key!");
+      }
+     }
+    }
+   }
+
+   // --- Use Item Function ---
+   function useItem() {
+    if (inventory.includes("Lantern")) {
+     showMessage("You used the Lantern to light your way!");
+     scene.fog.density = 0.05;
+    } else {
+     showMessage("You have no items to use!");
+    }
+   }
+
    // --- Animation Loop ---
    function animate() {
     requestAnimationFrame(animate);
@@ -791,3 +863,4 @@
  </body>
 
  </html>
+
